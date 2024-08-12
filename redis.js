@@ -2,16 +2,15 @@ const config = require('./config.js') ;
 const Redis = require('ioredis')
 // 创建Redis客户端实例
 const RedisCli = new Redis({
-    host: config.redis_host,
-    port: config.redis_port,
-    passwd: config.redis_passwd
+    host: config.redis_host,       // Redis服务器主机名
+    port: config.redis_port,        // Redis服务器端口号
+    password: config.redis_passwd, // Redis密码
 })
-
 /**
  * 监听错误信息
  */
 RedisCli.on("error", function (error){
-    console.log("RedisCli connect error")
+    console.log("RedisCli connect error",error)
     RedisCli.quit();
 })
 /**

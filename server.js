@@ -1,10 +1,17 @@
+
 const grpc = require('@grpc/grpc-js')
 const message_proto = require('./proto')
 const const_module = require('./const')
-const {v4:uuidv4} = require('uuid')
-const emailModule = require('./email')
+const { v4: uuidv4 } = require('uuid');
+const emailModule = require('./email');
 const redis_module = require('./redis')
 
+/**
+ * GetVarifyCode grpc响应获取验证码的服务
+ * @param {*} call 为grpc请求 
+ * @param {*} callback 为grpc回调
+ * @returns 
+ */
 async function GetVerifyCode(call, callback) {
     console.log("email is ", call.request.email)
     try{
@@ -21,8 +28,7 @@ async function GetVerifyCode(call, callback) {
             } 
             let bres = await redis_module.SetRedisExpire(const_module.code_prefix+call.request.email, uniqueId,600)
             if(!bres){
-                callback(null, { 
-                    email:  call.request.email,
+                callback(null, { email:  call.request.email,
                     error:const_module.Errors.RedisErr
                 });
                 return;
@@ -60,8 +66,8 @@ async function GetVerifyCode(call, callback) {
 function main() {
     var server = new grpc.Server()
     server.addService(message_proto.VerifyService.service, { GetVerifyCode: GetVerifyCode })
-    server.bindAsync('127.0.0.1:50051', grpc.ServerCredentials.createInsecure(), () => {
-        console.log('grpc server started')        
+    server.bindAsync('0.0.0.0:50051', grpc.ServerCredentials.createInsecure(), () => {
+        console.log('verify server started')        
     })
 }
 
